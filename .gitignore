@@ -2,4 +2,6 @@ btest
 fshow
 ishow
 *.o
+
 a.c
+a.out
