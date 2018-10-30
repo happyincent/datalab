@@ -111,7 +111,9 @@ NOTES:
  */
 int absVal(int x)
 {
-    return 42;
+    int check = x >> (sizeof(int) * 8 - 1);
+    return (x ^ check) + (1 & check);
+
 }
 
 /*
