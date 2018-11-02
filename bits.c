@@ -111,7 +111,7 @@ NOTES:
  */
 int absVal(int x)
 {
-    int check = x >> (32 - 1);
+    int check = x >> 31;
     return (x ^ check) + (1 & check);
 }
 
@@ -125,10 +125,10 @@ int absVal(int x)
  */
 int addOK(int x, int y)
 {
-    int x1 = (x >> (32 - 1)) & 0x1;
-    int y1 = (y >> (32 - 1)) & 0x1;
+    int x1 = (x >> 31) & 0x1;
+    int y1 = (y >> 31) & 0x1;
     int test = x + y;
-    int t1 = (test >> (32 - 1)) & 0x1;
+    int t1 = (test >> 31) & 0x1;
 
     // 0 0 0
     // 0 0 1 V
@@ -505,7 +505,7 @@ int fitsBits(int x, int n)
 {
     // 1 : 0 ~ -1
     // 2 : 1 ~ -2
-    return 42;
+    return !((x >> 31) ^ (x >> (n - 1)));
 }
 
 /*
@@ -518,7 +518,7 @@ int fitsBits(int x, int n)
  */
 int fitsShort(int x)
 {
-    return 42;
+    return !((x >> 31) ^ (x >> 15));
 }
 
 /*
