@@ -1125,9 +1125,8 @@ int remainderPower2(int x, int n)
  */
 int replaceByte(int x, int n, int c)
 {
-    unsigned move = (n << 3) & 0x1f;
-    unsigned mask = ~(0xff << move);
-    return (c << move) | (mask & x);
+    unsigned mask = ~(0xff << (n << 3));
+    return (c << (n << 3)) | (mask & x);
 }
 
 /*
@@ -1140,20 +1139,23 @@ int replaceByte(int x, int n, int c)
  */
 int rotateLeft(int x, int n)
 {
-    return 42;
+    unsigned mask = ((0x1 << n) + ((~1) + 1)) << (32 - n);
+    return ((x & mask) >> (32 - n)) | ((x & ~(mask)) << n);
 }
 
 /*
  * rotateRight - Rotate x to the right by n
  *               Can assume that 0 <= n <= 31
- *   Examples: rotateRight(0x87654321, 4) = 0x76543218
+ *   Examples: rotateRight(0x87654321, 4) = 0x76543218 ?
+ *   Examples: rotateRight(0x87654321, 4) = 0x18765432
  *   Legal ops: ~ & ^ | + << >> !
  *   Max ops: 25
  *   Rating: 3
  */
 int rotateRight(int x, int n)
 {
-    return 42;
+    unsigned mask = ((0x1 << n) + ((~1) + 1));
+    return ((x & mask) << (32 - n)) | ((x & (~mask)) >> n);
 }
 
 /*
@@ -1168,7 +1170,29 @@ int rotateRight(int x, int n)
  */
 int satAdd(int x, int y)
 {
-    return 42;
+    int x1 = (x >> 31) & 0x1;
+    int y1 = (y >> 31) & 0x1;
+    int test = x + y;
+    int t1 = (test >> 31) & 0x1;
+
+    // 0 0 0
+    // 0 0 1 V
+    // 0 1 0
+    // 0 1 1
+    // 1 0 0
+    // 1 0 1
+    // 1 1 0 V
+    // 1 1 1
+
+    unsigned min = 0x80 << 24;
+    unsigned max = min - 1;
+
+    unsigned o1 = x1 & y1 & !t1;
+    unsigned o2 = !x1 & !y1 & t1;
+    unsigned check = o1 | o2;
+
+    return ((((~(!o1) + 1) & max) | ((~(!o2) + 1) & min)) & (~(check) + 1)) |
+           ((~(!check) + 1) & test);
 }
 
 /*
@@ -1211,7 +1235,9 @@ int satMul3(int x)
  */
 int sign(int x)
 {
-    return 42;
+    unsigned bang = !!x;
+    unsigned sign = x >> 31;
+    return ((!sign) & bang) | (sign & (~(bang) + 1));
 }
 
 /*
@@ -1224,7 +1250,11 @@ int sign(int x)
  */
 int signMag2TwosComp(int x)
 {
-    return 42;
+    // if (x==0xffffffff) return 0x80000001;
+    // return 0x80000000 - x;
+    unsigned min = 0x80 << 24;
+    int sign = x >> 31;
+    return (sign & (min + ~x + 1)) | (~sign & x);
 }
 
 /*
@@ -1235,7 +1265,10 @@ int signMag2TwosComp(int x)
  */
 int specialBits(void)
 {
-    return 42;
+    // 11111111110010100011111111111111
+    // 00000000001101011100000000000000
+    // 1101 0111
+    return ~(0xD7 << 14);
 }
 
 /*
@@ -1248,7 +1281,21 @@ int specialBits(void)
  */
 int subtractionOK(int x, int y)
 {
-    return 42;
+    int x1 = (x >> 31) & 0x1;
+    int y1 = (y >> 31) & 0x1;
+    int test = x - y;
+    int t1 = (test >> 31) & 0x1;
+
+    // 0 0 0
+    // 0 0 1
+    // 0 1 0
+    // 0 1 1 V
+    // 1 0 0 V
+    // 1 0 1
+    // 1 1 0
+    // 1 1 1
+
+    return !(((!x1) & y1 & t1) | (x1 & !y1 & !t1));
 }
 
 /*
