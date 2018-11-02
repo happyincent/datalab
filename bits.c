@@ -396,7 +396,16 @@ int byteSwap(int x, int n, int m)
  */
 int conditional(int x, int y, int z)
 {
-    return 42;
+    unsigned mask = (0xff << 8) + 0xff;
+    x = (x >> 16) | (x & mask);
+    x |= x >> 8;
+    x |= x >> 4;
+    x |= x >> 2;
+    x |= x >> 1;
+    unsigned bang = (~x & 0x1);
+    // 0x0 -> 00000000, 0x1 -> ffffffff
+    bang = (~bang) + 1;
+    return (~bang & y) | (bang & z);
 }
 
 /*
@@ -422,7 +431,8 @@ int countLeadingZero(int x)
  */
 int copyLSB(int x)
 {
-    return 42;
+    // 0x0 -> 00000000, 0x1 -> ffffffff
+    return (~(x & 0x1)) + 1;
 }
 
 /*
@@ -434,7 +444,8 @@ int copyLSB(int x)
  */
 int distinctNegation(int x)
 {
-    return 42;
+    // 0x0, 0x80000000
+    return !!(x ^ (~x + 1));
 }
 
 /*
@@ -458,7 +469,11 @@ int dividePower2(int x, int n)
  */
 int evenBits(void)
 {
-    return 42;
+    int x = 0x55;
+    x |= x << 8;
+    x |= x << 16;
+    x |= x << 24;
+    return x;
 }
 
 /*
@@ -488,6 +503,8 @@ int ezThreeFourths(int x)
  */
 int fitsBits(int x, int n)
 {
+    // 1 : 0 ~ -1
+    // 2 : 1 ~ -2
     return 42;
 }
 
