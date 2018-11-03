@@ -751,6 +751,10 @@ int howManyBits(int x)
  */
 int implication(int x, int y)
 {
+    // 0 -> 0 : 1
+    // 0 -> 1 : 1
+    // 1 -> 0 : 0
+    // 1 -> 1 : 1
     return (y | (~x & ~y)) & 0x1;
 }
 
@@ -1139,8 +1143,8 @@ int replaceByte(int x, int n, int c)
  */
 int rotateLeft(int x, int n)
 {
-    unsigned mask = ((0x1 << n) + ((~1) + 1)) << (32 - n);
-    return ((x & mask) >> (32 - n)) | ((x & ~(mask)) << n);
+    unsigned mask = ((0x1 << n) + ((~1) + 1)) << (32 + (~n + 1));
+    return ((x & mask) >> (32 + (~n + 1))) | ((x & ~(mask)) << n);
 }
 
 /*
@@ -1155,7 +1159,7 @@ int rotateLeft(int x, int n)
 int rotateRight(int x, int n)
 {
     unsigned mask = ((0x1 << n) + ((~1) + 1));
-    return ((x & mask) << (32 - n)) | ((x & (~mask)) >> n);
+    return ((x & mask) << (32 + (~n + 1))) | ((x & (~mask)) >> n);
 }
 
 /*
@@ -1387,6 +1391,6 @@ int twosComp2SignMag(int x)
  */
 int upperBits(int n)
 {
-    int x = ((!!n & 0x1) << (32 - n));
+    int x = ((!!n & 0x1) << (32 + (~n + 1)));
     return (~x + 1);
 }
